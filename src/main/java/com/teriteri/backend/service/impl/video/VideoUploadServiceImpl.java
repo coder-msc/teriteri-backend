@@ -1,6 +1,5 @@
 package com.teriteri.backend.service.impl.video;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.teriteri.backend.mapper.VideoMapper;
 import com.teriteri.backend.mapper.VideoStatsMapper;
 import com.teriteri.backend.pojo.CustomResponse;
@@ -10,7 +9,7 @@ import com.teriteri.backend.pojo.dto.VideoUploadInfoDTO;
 import com.teriteri.backend.service.utils.CurrentUser;
 import com.teriteri.backend.service.video.VideoUploadService;
 import com.teriteri.backend.utils.ESUtil;
-import com.teriteri.backend.utils.OssUtil;
+import com.teriteri.backend.utils.FileUploadUtil;
 import com.teriteri.backend.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -54,7 +53,7 @@ public class VideoUploadServiceImpl implements VideoUploadService {
     private RabbitTemplate rabbitTemplate;
 
     @Autowired
-    private OssUtil ossUtil;
+    private FileUploadUtil fileUploadUtil;
 
     @Autowired
     private ESUtil esUtil;
@@ -200,7 +199,7 @@ public class VideoUploadServiceImpl implements VideoUploadService {
 //        }
 
         // 保存封面到OSS，返回URL
-        String coverUrl = ossUtil.uploadImage(cover, "cover");
+        String coverUrl = fileUploadUtil.uploadImage(cover, "cover");
 
         // 将投稿信息封装
         videoUploadInfoDTO.setCoverUrl(coverUrl);
@@ -277,7 +276,7 @@ public class VideoUploadServiceImpl implements VideoUploadService {
 //        }
 
         // 合并到OSS，并返回URL地址
-        url = ossUtil.appendUploadVideo(vui.getHash());
+        url = fileUploadUtil.appendUploadVideo(vui.getHash());
         if (url == null) {
             return;
         }

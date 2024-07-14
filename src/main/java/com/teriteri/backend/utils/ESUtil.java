@@ -29,13 +29,13 @@ public class ESUtil {
      * @param video
      */
     public void addVideo(Video video) throws IOException {
-        try {
+       /* try {
             ESVideo esVideo = new ESVideo(video.getVid(), video.getUid(), video.getTitle(), video.getMcId(), video.getScId(), video.getTags(), video.getStatus());
             client.index(i -> i.index("video").id(esVideo.getVid().toString()).document(esVideo));
         } catch (IOException e) {
             log.error("添加视频文档到ElasticSearch时出错了：" + e);
             throw e;
-        }
+        }*/
     }
 
     /**
@@ -43,12 +43,12 @@ public class ESUtil {
      * @param vid
      */
     public void deleteVideo(Integer vid) throws IOException {
-        try {
+      /*  try {
             client.delete(d -> d.index("video").id(vid.toString()));
         } catch (IOException e) {
             log.error("删除ElasticSearch视频文档时失败了：" + e);
             throw e;
-        }
+        }*/
     }
 
     /**
@@ -56,13 +56,13 @@ public class ESUtil {
      * @param video
      */
     public void updateVideo(Video video) throws IOException {
-        try {
+       /* try {
             ESVideo esVideo = new ESVideo(video.getVid(), video.getUid(), video.getTitle(), video.getMcId(), video.getScId(), video.getTags(), video.getStatus());
             client.update(u -> u.index("video").id(video.getVid().toString()).doc(esVideo), ESVideo.class);
         } catch (IOException e) {
             log.error("更新ElasticSearch视频文档时出错了：" + e);
             throw e;
-        }
+        }*/
     }
 
     /**
@@ -72,7 +72,7 @@ public class ESUtil {
      * @return
      */
     public Long getVideoCount(String keyword, boolean onlyPass) {
-        try {
+        /*try {
             Query query = Query.of(q -> q.multiMatch(m -> m.fields("title", "tags").query(keyword)));
             Query query1 = Query.of(q -> q.constantScore(c -> c.filter(f -> f.term(t -> t.field("status").value(1)))));
             Query bool = Query.of(q -> q.bool(b -> b.must(query1).must(query)));
@@ -87,7 +87,7 @@ public class ESUtil {
         } catch (IOException e) {
             log.error("查询ES相关视频数量时出错了：" + e);
             return 0L;
-        }
+        }*/return 0L;
     }
 
     /**
@@ -98,7 +98,7 @@ public class ESUtil {
      * @return 包含查到的数据id列表，按匹配分数排序
      */
     public List<Integer> searchVideosByKeyword(String keyword, Integer page, Integer size, boolean onlyPass) {
-        try {
+       /* try {
             List<Integer> list = new ArrayList<>();
             Query query = Query.of(q -> q.multiMatch(m -> m.fields("title", "tags").query(keyword)));
             Query query1 = Query.of(q -> q.constantScore(c -> c.filter(f -> f.term(t -> t.field("status").value(1)))));
@@ -117,7 +117,8 @@ public class ESUtil {
         } catch (IOException e) {
             log.error("查询ES相关视频文档时出错了：" + e);
             return Collections.emptyList();
-        }
+        }*/
+        return Collections.emptyList();
     }
 
 
@@ -126,13 +127,13 @@ public class ESUtil {
      * @param user
      */
     public void addUser(User user) throws IOException {
-        try {
+       /* try {
             ESUser esUser = new ESUser(user.getUid(), user.getNickname());
             client.index(i -> i.index("user").id(esUser.getUid().toString()).document(esUser));
         } catch (IOException e) {
             log.error("添加用户文档到elasticsearch时出错了：" + e);
             throw e;
-        }
+        }*/
     }
 
     /**
@@ -140,12 +141,12 @@ public class ESUtil {
      * @param uid
      */
     public void deleteUser(Integer uid) throws IOException {
-        try {
+       /* try {
             client.delete(d -> d.index("user").id(uid.toString()));
         } catch (IOException e) {
             log.error("删除ElasticSearch用户文档时失败了：" + e);
             throw e;
-        }
+        }*/
     }
 
     /**
@@ -153,13 +154,13 @@ public class ESUtil {
      * @param user
      */
     public void updateUser(User user) throws IOException {
-        try {
+        /*try {
             ESUser esUser = new ESUser(user.getUid(), user.getNickname());
             client.update(u -> u.index("user").id(user.getUid().toString()).doc(esUser), ESUser.class);
         } catch (IOException e) {
             log.error("更新ElasticSearch用户文档时出错了：" + e);
             throw e;
-        }
+        }*/
     }
 
     /**
@@ -168,7 +169,7 @@ public class ESUtil {
      * @return
      */
     public Long getUserCount(String keyword) {
-        try {
+    /*    try {
             Query query = Query.of(q -> q.simpleQueryString(s -> s.fields("nickname").query(keyword).defaultOperator(Operator.And)));
             CountRequest countRequest = new CountRequest.Builder().index("user").query(query).build();
             CountResponse countResponse = client.count(countRequest);
@@ -176,7 +177,8 @@ public class ESUtil {
         } catch (IOException e) {
             log.error("查询ES相关用户数量时出错了：" + e);
             return 0L;
-        }
+        }*/
+        return 0L;
     }
 
     /**
@@ -187,7 +189,7 @@ public class ESUtil {
      * @return 包含查到的数据id列表，按匹配分数排序
      */
     public List<Integer> searchUsersByKeyword(String keyword, Integer page, Integer size) {
-        try {
+    /*    try {
             List<Integer> list = new ArrayList<>();
             Query query = Query.of(q -> q.simpleQueryString(s -> s.fields("nickname").query(keyword).defaultOperator(Operator.And)));
             SearchRequest searchRequest = new SearchRequest.Builder().index("user").query(query).from((page - 1) * size).size(size).build();
@@ -199,7 +201,7 @@ public class ESUtil {
         } catch (IOException e) {
             log.error("查询ES相关用户文档时出错了：" + e);
             return Collections.emptyList();
-        }
+        }*/ return Collections.emptyList();
     }
 
 
@@ -210,12 +212,12 @@ public class ESUtil {
      * @param text
      */
     public void addSearchWord(String text) {
-        try {
+       /* try {
             ESSearchWord esSearchWord = new ESSearchWord(text);
             client.index(i -> i.index("search_word").document(esSearchWord));
         } catch (IOException e) {
             log.error("添加搜索词文档到elasticsearch时出错了：" + e);
-        }
+        }*/
     }
 
     /**
@@ -224,7 +226,7 @@ public class ESUtil {
      * @return
      */
     public List<String> getMatchingWord(String text) {
-        try {
+ /*       try {
             List<String> list = new ArrayList<>();
             Query query = Query.of(q -> q.simpleQueryString(s -> s.fields("content").query(text).defaultOperator(Operator.And)));   // 关键词全匹配
             Query query1 = Query.of(q -> q.prefix(p -> p.field("content").value(text)));
@@ -238,6 +240,7 @@ public class ESUtil {
         } catch (IOException e) {
             log.error("获取ES搜索提示词时出错了：" + e);
             return Collections.emptyList();
-        }
+        }*/
+        return Collections.emptyList();
     }
 }

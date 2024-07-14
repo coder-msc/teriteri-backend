@@ -13,7 +13,7 @@ import com.teriteri.backend.service.utils.CurrentUser;
 import com.teriteri.backend.service.video.VideoService;
 import com.teriteri.backend.service.video.VideoStatsService;
 import com.teriteri.backend.utils.ESUtil;
-import com.teriteri.backend.utils.OssUtil;
+import com.teriteri.backend.utils.FileUploadUtil;
 import com.teriteri.backend.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.ExecutorType;
@@ -58,7 +58,7 @@ public class VideoServiceImpl implements VideoService {
     private RedisUtil redisUtil;
 
     @Autowired
-    private OssUtil ossUtil;
+    private FileUploadUtil fileUploadUtil;
 
     @Autowired
     private ESUtil esUtil;
@@ -442,8 +442,8 @@ public class VideoServiceImpl implements VideoService {
                     redisUtil.delValue("danmu_idset:" + vid);   // 删除该视频的弹幕
                     redisUtil.zsetDelMember("user_video_upload:" + video.getUid(), video.getVid());
                     // 搞个异步线程去删除OSS的源文件
-                    CompletableFuture.runAsync(() -> ossUtil.deleteFiles(videoPrefix), taskExecutor);
-                    CompletableFuture.runAsync(() -> ossUtil.deleteFiles(coverPrefix), taskExecutor);
+                    CompletableFuture.runAsync(() -> fileUploadUtil.deleteFiles(videoPrefix), taskExecutor);
+                    CompletableFuture.runAsync(() -> fileUploadUtil.deleteFiles(coverPrefix), taskExecutor);
                     // 批量删除该视频下的全部评论缓存
                     CompletableFuture.runAsync(() -> {
                         Set<Object> set = redisUtil.zReverange("comment_video:" + vid, 0, -1);

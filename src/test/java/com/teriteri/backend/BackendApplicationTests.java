@@ -1,10 +1,8 @@
 package com.teriteri.backend;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
-import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
 import co.elastic.clients.elasticsearch.indices.CreateIndexResponse;
 import com.alibaba.druid.pool.DruidDataSource;
@@ -14,14 +12,13 @@ import com.teriteri.backend.mapper.VideoMapper;
 import com.teriteri.backend.pojo.*;
 import com.teriteri.backend.service.video.VideoStatsService;
 import com.teriteri.backend.utils.ESUtil;
-import com.teriteri.backend.utils.OssUtil;
+import com.teriteri.backend.utils.FileUploadUtil;
 import com.teriteri.backend.utils.RedisUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.DataSource;
@@ -36,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-@SpringBootTest(properties = {"spring.profiles.active=test"})
+@SpringBootTest//(properties = {"spring.profiles.active=test"})
 class ApplicationTests {
     @Autowired
     DataSource dataSource;
@@ -57,7 +54,7 @@ class ApplicationTests {
     private VideoStatsService videoStatsService;
 
     @Autowired
-    private OssUtil ossUtil;
+    private FileUploadUtil fileUploadUtil;
 
     @Autowired
     private ElasticsearchClient client;
@@ -117,18 +114,18 @@ class ApplicationTests {
         FileInputStream fileInputStream = new FileInputStream(file);
         MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(),
                 "application/sql", fileInputStream);
-        String url = ossUtil.uploadImage(multipartFile, "cover");
+        String url = fileUploadUtil.uploadImage(multipartFile, "cover");
         System.out.println(url);
     }
 
     @Test
     void ossCountFiles() {
-        System.out.println(ossUtil.countFiles("img/cover/1696"));
+        System.out.println(fileUploadUtil.countFiles("img/cover/1696"));
     }
 
     @Test
     void ossdeleteFiles() {
-        ossUtil.deleteFiles("img/cover/1696");
+        fileUploadUtil.deleteFiles("img/cover/1696");
     }
 
     @Test
