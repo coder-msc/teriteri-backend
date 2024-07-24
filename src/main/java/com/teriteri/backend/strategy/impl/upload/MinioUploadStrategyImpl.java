@@ -124,7 +124,8 @@ public class MinioUploadStrategyImpl extends AbstractUploadStrategy {
     @Override
     public String getFileAccessUrl(String filePath) {
         //获取文件的访问路径URL
-        String url = minioProperties.getEndpoint() + "/" + minioProperties.getBucketName() + "/" + filePath;
+//        String url = minioProperties.getEndpoint() + "/" + minioProperties.getBucketName() + "/" + filePath;
+        String url = minioProperties.getBucketName() + "/" + filePath;
         log.info("上传到minio文件|访问路径：{} ", url);
         return url;
     }

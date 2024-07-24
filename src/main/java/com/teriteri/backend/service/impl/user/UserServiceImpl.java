@@ -7,6 +7,7 @@ import com.teriteri.backend.pojo.CustomResponse;
 import com.teriteri.backend.pojo.User;
 import com.teriteri.backend.pojo.VideoStats;
 import com.teriteri.backend.pojo.dto.UserDTO;
+import com.teriteri.backend.service.comment.SiteConfigService;
 import com.teriteri.backend.service.user.UserService;
 import com.teriteri.backend.service.video.VideoStatsService;
 import com.teriteri.backend.utils.ESUtil;
@@ -49,7 +50,8 @@ public class UserServiceImpl implements UserService {
 
     @Value("${upload.oss.bucketName}")
     private String OSS_BUCKET_URL;
-
+    @Autowired
+    private SiteConfigService siteConfigService;
     @Autowired
     @Qualifier("taskExecutor")
     private Executor taskExecutor;
@@ -66,6 +68,8 @@ public class UserServiceImpl implements UserService {
         // 如果redis中没有user数据，就从mysql中获取并更新到redis
         if (user == null) {
             user = userMapper.selectById(id);
+            String fileServiceDomain = siteConfigService.getFileServiceDomain();
+            user.setAvatar(fileServiceDomain + "" + user.getAvatar());
             if (user == null) {
                 return null;    // 如果uid不存在则返回空
             }
@@ -230,6 +234,8 @@ public class UserServiceImpl implements UserService {
         String avatar_url = fileUploadUtil.uploadImage(file, "avatar");
         // 查旧的头像地址
         User user = userMapper.selectById(uid);
+        String fileServiceDomain = siteConfigService.getFileServiceDomain();
+        user.setAvatar(fileServiceDomain + "" + user.getAvatar());
         // 先更新数据库
         UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("uid", uid).set("avatar", avatar_url);

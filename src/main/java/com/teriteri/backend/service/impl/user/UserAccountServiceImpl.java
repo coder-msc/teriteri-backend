@@ -11,6 +11,7 @@ import com.teriteri.backend.pojo.Favorite;
 import com.teriteri.backend.pojo.MsgUnread;
 import com.teriteri.backend.pojo.User;
 import com.teriteri.backend.pojo.dto.UserDTO;
+import com.teriteri.backend.service.comment.SiteConfigService;
 import com.teriteri.backend.service.user.UserAccountService;
 import com.teriteri.backend.service.user.UserService;
 import com.teriteri.backend.service.utils.CurrentUser;
@@ -67,7 +68,8 @@ public class UserAccountServiceImpl implements UserAccountService {
 
     @Autowired
     private AuthenticationProvider authenticationProvider;
-
+    @Autowired
+    private SiteConfigService siteConfigService;
     @Autowired
     @Qualifier("taskExecutor")
     private Executor taskExecutor;
@@ -343,6 +345,8 @@ public class UserAccountServiceImpl implements UserAccountService {
         // 如果redis中没有user数据，就从mysql中获取并更新到redis
         if (user == null) {
             user = userMapper.selectById(LoginUserId);
+            String fileServiceDomain = siteConfigService.getFileServiceDomain();
+            user.setAvatar(fileServiceDomain + "" + user.getAvatar());
             User finalUser = user;
             CompletableFuture.runAsync(() -> {
                 redisUtil.setExObjectValue("user:" + finalUser.getUid(), finalUser);  // 默认存活1小时

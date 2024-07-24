@@ -7,6 +7,7 @@ import com.teriteri.backend.mapper.FavoriteMapper;
 import com.teriteri.backend.mapper.VideoMapper;
 import com.teriteri.backend.pojo.Favorite;
 import com.teriteri.backend.pojo.Video;
+import com.teriteri.backend.service.comment.SiteConfigService;
 import com.teriteri.backend.service.video.FavoriteService;
 import com.teriteri.backend.utils.RedisUtil;
 import org.apache.ibatis.session.ExecutorType;
@@ -38,6 +39,8 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Autowired
     @Qualifier("taskExecutor")
     private Executor taskExecutor;
+    @Autowired
+    private SiteConfigService siteConfigService;
 
     @Override
     public List<Favorite> getFavorites(Integer uid, boolean isOwner) {
@@ -69,6 +72,9 @@ public class FavoriteServiceImpl implements FavoriteService {
                         if (set != null && set.size() > 0) {
                             Integer vid = (Integer) set.iterator().next();
                             Video video = videoMapper.selectById(vid);
+                            String fileServiceDomain = siteConfigService.getFileServiceDomain();
+                            video.setVideoUrl(fileServiceDomain + "" + video.getVideoUrl());
+                            video.setCoverUrl(fileServiceDomain + "" + video.getCoverUrl());
                             favorite.setCover(video.getCoverUrl());
                         }
                     }

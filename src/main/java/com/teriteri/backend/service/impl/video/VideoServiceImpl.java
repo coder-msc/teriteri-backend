@@ -8,6 +8,7 @@ import com.teriteri.backend.pojo.CustomResponse;
 import com.teriteri.backend.pojo.Video;
 import com.teriteri.backend.pojo.VideoStats;
 import com.teriteri.backend.service.category.CategoryService;
+import com.teriteri.backend.service.comment.SiteConfigService;
 import com.teriteri.backend.service.user.UserService;
 import com.teriteri.backend.service.utils.CurrentUser;
 import com.teriteri.backend.service.video.VideoService;
@@ -69,7 +70,8 @@ public class VideoServiceImpl implements VideoService {
     @Autowired
     @Qualifier("taskExecutor")
     private Executor taskExecutor;
-
+    @Autowired
+    private SiteConfigService siteConfigService;
     /**
      * 根据id分页获取视频信息，包括用户和分区信息
      * @param set   要查询的视频id集合
@@ -111,6 +113,9 @@ public class VideoServiceImpl implements VideoService {
 //                    long start = System.currentTimeMillis();
 //                    System.out.println("================ 开始查询 " + video.getVid() + " 号视频相关信息 ===============   当前时间 " + start);
                     Map<String, Object> map = new HashMap<>();
+                    String fileServiceDomain = siteConfigService.getFileServiceDomain();
+                    video.setVideoUrl(fileServiceDomain + "" + video.getVideoUrl());
+                    video.setCoverUrl(fileServiceDomain + "" + video.getCoverUrl());
                     map.put("video", video);
 
                     CompletableFuture<Void> userFuture = CompletableFuture.runAsync(() -> {
@@ -159,6 +164,9 @@ public class VideoServiceImpl implements VideoService {
                             .findFirst()
                             .orElse(null);
                     if (video == null) return Stream.empty(); // 跳过该项
+                    String fileServiceDomain = siteConfigService.getFileServiceDomain();
+                    video.setVideoUrl(fileServiceDomain + "" + video.getVideoUrl());
+                    video.setCoverUrl(fileServiceDomain + "" + video.getCoverUrl());
                     if (video.getStatus() == 3) {
                         // 视频已删除
                         Video video1 = new Video();
@@ -270,6 +278,9 @@ public class VideoServiceImpl implements VideoService {
             queryWrapper.eq("vid", vid).ne("status", 3);
             video = videoMapper.selectOne(queryWrapper);
             if (video != null) {
+                String fileServiceDomain = siteConfigService.getFileServiceDomain();
+                video.setVideoUrl(fileServiceDomain + "" + video.getVideoUrl());
+                video.setCoverUrl(fileServiceDomain + "" + video.getCoverUrl());
                 Video finalVideo1 = video;
                 CompletableFuture.runAsync(() -> {
                     redisUtil.setExObjectValue("video:" + vid, finalVideo1);    // 异步更新到redis
@@ -316,10 +327,12 @@ public class VideoServiceImpl implements VideoService {
                             .filter(v -> Objects.equals(v.getVid(), vid))
                             .findFirst()
                             .orElse(null);
-
                     if (video == null) {
                         return Stream.empty(); // 跳过该项
                     }
+                    String fileServiceDomain = siteConfigService.getFileServiceDomain();
+                    video.setVideoUrl(fileServiceDomain + "" + video.getVideoUrl());
+                    video.setCoverUrl(fileServiceDomain + "" + video.getCoverUrl());
                     map.put("video", video);
 
                     CompletableFuture<Void> userFuture = CompletableFuture.runAsync(() -> {
@@ -366,6 +379,9 @@ public class VideoServiceImpl implements VideoService {
                     customResponse.setMessage("视频不见了QAQ");
                     return customResponse;
                 }
+                String fileServiceDomain = siteConfigService.getFileServiceDomain();
+                video.setVideoUrl(fileServiceDomain + "" + video.getVideoUrl());
+                video.setCoverUrl(fileServiceDomain + "" + video.getCoverUrl());
                 Integer lastStatus = video.getStatus();
                 video.setStatus(1);
                 UpdateWrapper<Video> updateWrapper = new UpdateWrapper<>();
@@ -396,6 +412,9 @@ public class VideoServiceImpl implements VideoService {
                     customResponse.setMessage("视频不见了QAQ");
                     return customResponse;
                 }
+                String fileServiceDomain = siteConfigService.getFileServiceDomain();
+                video.setVideoUrl(fileServiceDomain + "" + video.getVideoUrl());
+                video.setCoverUrl(fileServiceDomain + "" + video.getCoverUrl());
                 Integer lastStatus = video.getStatus();
                 video.setStatus(2);
                 UpdateWrapper<Video> updateWrapper = new UpdateWrapper<>();
@@ -425,6 +444,9 @@ public class VideoServiceImpl implements VideoService {
                 customResponse.setMessage("视频不见了QAQ");
                 return customResponse;
             }
+            String fileServiceDomain = siteConfigService.getFileServiceDomain();
+            video.setVideoUrl(fileServiceDomain + "" + video.getVideoUrl());
+            video.setCoverUrl(fileServiceDomain + "" + video.getCoverUrl());
             if (Objects.equals(userId, video.getUid()) || currentUser.isAdmin()) {
                 String videoUrl = video.getVideoUrl();
                 String videoPrefix = videoUrl.split("aliyuncs.com/")[1];  // OSS视频文件名

@@ -2,6 +2,7 @@ package com.teriteri.backend.service.utils;
 
 import com.teriteri.backend.mapper.UserMapper;
 import com.teriteri.backend.pojo.User;
+import com.teriteri.backend.service.comment.SiteConfigService;
 import com.teriteri.backend.service.impl.user.UserDetailsImpl;
 import com.teriteri.backend.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,8 @@ public class CurrentUser {
 
     @Autowired
     private UserMapper userMapper;
-
+    @Autowired
+    private SiteConfigService siteConfigService;
     /**
      * 获取当前登录用户的uid，也是JWT认证的一环
      * @return 当前登录用户的uid
@@ -39,6 +41,8 @@ public class CurrentUser {
         User user = redisUtil.getObject("user:" + uid, User.class);
         if (user == null) {
             user = userMapper.selectById(uid);
+            String fileServiceDomain = siteConfigService.getFileServiceDomain();
+            user.setAvatar(fileServiceDomain + "" + user.getAvatar());
             redisUtil.setExObjectValue("user:" + user.getUid(), user);
         }
         return (user.getRole() == 1 || user.getRole() == 2);
